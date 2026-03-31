@@ -16,15 +16,14 @@ const forecastContainer = document.getElementById("forecast");
 //FUNCTION AMBIL DATA DARI API / CONNECT API (REAL DATA)
 async function getWeather(city) {
     const apiKey = "1a950d99464449cd9c334007263003";
-    const url = `https://api.weatherapi.com/v1/forecast.json?key
-    =${apiKey}&q=${city}&days=4&aqi=no&alerts=no;`;
-    
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=4&aqi=no&alerts=no`;
+
     loading.style.display = "block";
     //Loading delay 1
     await new Promise(resolve => setTimeout(resolve, 300));
     const response = await fetch(url);
     if (!response.ok) {
-        alert("Kota Tidak Ditemukan !!!");
+        throw new Error("Kota Tidak Ditemukan !!!");
     }
 
     const data = await response.json();
