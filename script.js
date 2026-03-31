@@ -9,82 +9,100 @@ const Wind = document.getElementById("wind");
 const loading = document.getElementById("loading");
 const Icon = document.getElementById("weatherIcon");
 const forecastContainer = document.getElementById("forecast");
+const errorMsg = document.getElementById("errorMsg");
 
 //console.log(input);
 //console.log("button");
 
 //FUNCTION AMBIL DATA DARI API / CONNECT API (REAL DATA)
 async function getWeather(city) {
-    const apiKey = "1a950d99464449cd9c334007263003";
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=4&aqi=no&alerts=no`;
 
+  // 1. VALIDASI INPUT
+  if (!city) {
+    errorMsg.innerText = "Masukkan Nama Kota!";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  errorMsg.style.display = "none";
+
+  // 2. SET API
+  const apiKey = "1a950d99464449cd9c334007263003";
+  const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=4&aqi=no&alerts=no`;
+
+  try {
+    // 3. LOADING ON
     loading.style.display = "block";
-    //Loading delay 1
-    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // 4. FETCH
     const response = await fetch(url);
+
+    // 5. HANDLE ERROR API
     if (!response.ok) {
-        throw new Error("Kota Tidak Ditemukan !!!");
+      throw new Error("Kota tidak ditemukan!");
     }
 
+    // 6. AMBIL DATA
     const data = await response.json();
 
-    const firstDay = data.forecast.forecastday[0];
-    //console.log(firsDay);
-    
+    // =========================
+    // 🎯 SEMUA LOGIC HARUS DI SINI
+    // =========================
+
+    // FORECAST
     forecastContainer.innerHTML = "";
 
     data.forecast.forecastday.slice(1).forEach(day => {
-    forecastContainer.innerHTML += `
+      forecastContainer.innerHTML += `
         <div class="forecast-item">
-        <p>${day.date}</p>
-        <p>${Math.round(day.day.avgtemp_c)}°C</p>
-        </div>`;
+          <p>${day.date}</p>
+          <p>${Math.round(day.day.avgtemp_c)}°C</p>
+        </div>
+      `;
     });
 
-    //console.log(data.forecast.forecastday);
-    loading.style.display = "none";
-
-    //ICON SESUAI KONDISI
+    // ICON
     const icon = data.current.condition.icon;
     Icon.src = "https:" + icon;
 
-    console.log(data);
-    //ambil data ini dari API
+    // DATA UTAMA
     const cityName = data.location.name;
     const temp = data.current.temp_c;
     const condition = data.current.condition.text;
-    changeBackground(condition.toLowerCase());
-
     const humidity = data.current.humidity;
     const wind = data.current.wind_kph;
 
-    //test data berhasil di ambil di console
-    //console.log(cityName);
-    //console.log(temp);
-    //console.log(condition);
-    //console.log(humidity);
-    //console.log(wind);
+    // FORMAT TEXT
+    const formattedCondition = condition
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
 
-    //tampilkan data ke UI
+    // UPDATE UI
     City.textContent = cityName;
     Temperature.textContent = Math.round(temp) + "℃";
-
-    const formattedCondition = condition.split(" ").map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)).join(" "); // Tulisan Jdi Kapital di depan
     Condition.textContent = formattedCondition;
-    
     Humidity.textContent = humidity + "%";
     Wind.textContent = wind + " km/h";
+
+    // BACKGROUND
+    changeBackground(condition.toLowerCase());
+
+  } catch (error) {
+    // ERROR HANDLING
+    errorMsg.innerText = error.message;
+    errorMsg.style.display = "block";
+  } finally {
+    // LOADING OFF
+    loading.style.display = "none";
+  }
 }
 
 //FUNCTION HANDLE SEARCH
 function handleSearch(){
     const city = input.value.trim();
 
-    if (!city) {
-        alert("Masukkan Nama Kota !!!");
-        return;
-    }
+
     getWeather(city);
     input.value = "";
     input.focus();
