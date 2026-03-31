@@ -21,7 +21,7 @@ A responsive Weather App that provides real-time weather data and a 3-day foreca
 
 ## 📸 Preview
 
-(Add your screenshot here)
+weather.jpeg
 
 ## 🔗 Live Demo
 
