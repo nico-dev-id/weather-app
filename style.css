@@ -124,6 +124,10 @@ body {
     width: 80px;
 }
 
+#weatherIcon {
+    transition: 0.3s;
+}
+
 .temperature {
     font-size: 48px;
     font-weight: bold;
